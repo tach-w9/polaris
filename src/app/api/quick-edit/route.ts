@@ -2,10 +2,12 @@ import { z } from "zod";
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { anthropic } from "@ai-sdk/anthropic";
+import { createGroq } from "@ai-sdk/groq";
 
 import { firecrawl } from "@/lib/firecrawl";
-
+const groq = createGroq({
+  apiKey: "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"
+});
 const quickEditSchema = z.object({
   editedCode: z
     .string()
@@ -102,7 +104,13 @@ export async function POST(request: Request) {
       .replace("{documentation}", documentationContext);
 
     const { output } = await generateText({
-      model: anthropic("claude-3-7-sonnet-20250219"),
+      model: groq('qwen/qwen3-32b'),
+      providerOptions: {
+        groq: {
+          reasoningFormat: 'hidden',
+          reasoningEffort: 'default'
+        }
+      },
       output: Output.object({ schema: quickEditSchema }),
       prompt,
     });
