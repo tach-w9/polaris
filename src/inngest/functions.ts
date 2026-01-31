@@ -1,10 +1,12 @@
 import { generateText } from "ai";
 import { inngest } from "./client";
-import { anthropic } from "@ai-sdk/anthropic";
+import { createGroq } from "@ai-sdk/groq";
 import { firecrawl } from "@/lib/firecrawl";
 
 const URL_REGEX = /https?:\/\/[^\s]+/g;
-
+const groq = createGroq({
+  apiKey: "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"
+});
 export const demoGenerate = inngest.createFunction(
   { id: "demo-generate" },
   { event: "demo/generate" },
@@ -34,7 +36,13 @@ export const demoGenerate = inngest.createFunction(
 
     await step.run("generate-text", async () => {
       return await generateText({
-        model: anthropic('claude-3-haiku-20240307'),
+        model: groq('qwen/qwen3-32b'),
+        providerOptions: {
+          groq: {
+            reasoningFormat: 'hidden',
+            reasoningEffort: 'default'
+          }
+        },
         prompt: finalPrompt,
         experimental_telemetry: {
           isEnabled: true,
